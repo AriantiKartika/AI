@@ -63,7 +63,7 @@ print(f"\nRute terbaik dari {start} ke {goal}:")
 print(" -> ".join(path))
 print(f"Total jarak: {cost} km")
 
-# Visualisasi d
+# Visualisasi 
 G = nx.Graph()
 for city, neighbors in graph.items():
     for neighbor, weight in neighbors:
