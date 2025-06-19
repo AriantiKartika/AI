@@ -32,7 +32,7 @@ def uniform_cost_search(graph, start, goal):
                 heapq.heappush(frontier, Node(neighbor, node, node.cost + cost))
     return None, None
 
-# Graph kota besar Jawa
+# Graph kota yang ada di Jawa
 graph = {
     'Jakarta': [('Bandung', 150), ('Cirebon', 220)],
     'Bandung': [('Jakarta', 150), ('Cirebon', 130), ('Yogyakarta', 390)],
@@ -63,7 +63,7 @@ print(f"\nRute terbaik dari {start} ke {goal}:")
 print(" -> ".join(path))
 print(f"Total jarak: {cost} km")
 
-# Visualisasi dengan NetworkX
+# Visualisasi d
 G = nx.Graph()
 for city, neighbors in graph.items():
     for neighbor, weight in neighbors:
@@ -99,4 +99,3 @@ plt.title(f"Rute Terbaik dari {start} ke {goal} (UCS)", fontsize=14)
 plt.text(0, -1.15, f"Total Jarak: {cost} km", fontsize=12, ha='center', color='darkblue')
 plt.tight_layout()
 plt.show()
-
