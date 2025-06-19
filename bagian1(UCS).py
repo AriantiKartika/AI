@@ -9,7 +9,7 @@ class Node:
         self.cost = cost
 
     def __lt__(self, other):
-        return self.cost < other.cost  # hanya berdasarkan g(n)
+        return self.cost < other.cost  
 
 # UCS: f(n) = g(n)
 def uniform_cost_search(graph, start, goal):
