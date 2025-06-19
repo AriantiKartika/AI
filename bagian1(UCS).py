@@ -3,24 +3,25 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 class Node:
-    def __init__(self, state, parent=None, cost=0, heuristic=0):
+    def __init__(self, state, parent=None, cost=0):
         self.state = state
         self.parent = parent
         self.cost = cost
-        self.heuristic = heuristic
 
     def __lt__(self, other):
-        return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+        return self.cost < other.cost  # hanya berdasarkan g(n)
 
-def a_star_search(graph, heuristics, start, goal):
+# UCS: f(n) = g(n)
+def uniform_cost_search(graph, start, goal):
     frontier = []
-    heapq.heappush(frontier, Node(start, None, 0, heuristics[start][goal]))
+    heapq.heappush(frontier, Node(start, None, 0))
     explored = set()
 
     while frontier:
         node = heapq.heappop(frontier)
         if node.state == goal:
-            path, total_cost = [], node.cost
+            path = []
+            total_cost = node.cost
             while node:
                 path.append(node.state)
                 node = node.parent
@@ -28,8 +29,7 @@ def a_star_search(graph, heuristics, start, goal):
         explored.add(node.state)
         for neighbor, cost in graph.get(node.state, []):
             if neighbor not in explored:
-                heuristic = heuristics[neighbor].get(goal, float('inf'))
-                heapq.heappush(frontier, Node(neighbor, node, node.cost + cost, heuristic))
+                heapq.heappush(frontier, Node(neighbor, node, node.cost + cost))
     return None, None
 
 # Graph kota besar Jawa
@@ -44,26 +44,6 @@ graph = {
     'Malang': [('Solo', 300), ('Surabaya', 100)]
 }
 
-# Heuristik satu arah (hanya sebagian dari kota ke tujuan)
-heuristics = {
-    'Jakarta': {'Surabaya': 780, 'Malang': 820, 'Yogyakarta': 540, 'Semarang': 430, 'Bandung': 150, 'Solo': 610, 'Cirebon': 220},
-    'Bandung': {'Surabaya': 690, 'Malang': 730, 'Yogyakarta': 450, 'Semarang': 340, 'Solo': 520, 'Cirebon': 130},
-    'Cirebon': {'Surabaya': 600, 'Malang': 650, 'Yogyakarta': 380, 'Semarang': 240, 'Solo': 420},
-    'Semarang': {'Surabaya': 360, 'Malang': 420, 'Yogyakarta': 120, 'Solo': 110},
-    'Yogyakarta': {'Surabaya': 320, 'Malang': 380, 'Solo': 60},
-    'Solo': {'Surabaya': 260, 'Malang': 300},
-    'Surabaya': {'Malang': 100},
-    'Malang': {'Surabaya': 100}
-}
-
-# Lengkapi heuristic agar bisa dipakai 2 arah (bidirectional)
-for from_city in list(heuristics.keys()):
-    for to_city in heuristics[from_city]:
-        if to_city not in heuristics:
-            heuristics[to_city] = {}
-        if from_city not in heuristics[to_city]:
-            heuristics[to_city][from_city] = heuristics[from_city][to_city]
-
 # Input dari user
 print("Daftar kota:", ', '.join(graph.keys()))
 start = input("Masukkan kota asal: ").strip().title()
@@ -73,7 +53,7 @@ if start not in graph or goal not in graph:
     print("Kota tidak ditemukan.")
     exit()
 
-path, cost = a_star_search(graph, heuristics, start, goal)
+path, cost = uniform_cost_search(graph, start, goal)
 
 if not path:
     print("Rute tidak ditemukan.")
@@ -115,7 +95,8 @@ edge_labels = {(u, v): f"{d['weight']} km" for u, v, d in G.edges(data=True)}
 nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=8)
 
 # Tambahkan total jarak di bawah grafik
-plt.title(f"Rute Terbaik dari {start} ke {goal} (A*)", fontsize=14)
+plt.title(f"Rute Terbaik dari {start} ke {goal} (UCS)", fontsize=14)
 plt.text(0, -1.15, f"Total Jarak: {cost} km", fontsize=12, ha='center', color='darkblue')
 plt.tight_layout()
 plt.show()
+
